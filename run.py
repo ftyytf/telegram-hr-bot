@@ -10,15 +10,15 @@ from config import BOT_TOKEN
 from database.db import init_db
 
 from handlers.start import router as start_router
-from handlers.log_event import router as log_router
-from handlers.analytics import router as analytics_router
+from handlers.tracker import router as tracker_router
+from handlers.stats import router as stats_router
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
 dp.include_router(start_router)
-dp.include_router(log_router)
-dp.include_router(analytics_router)
+dp.include_router(tracker_router)
+dp.include_router(stats_router)
 
 async def main():
     print("=== INIT DB ===", flush=True)

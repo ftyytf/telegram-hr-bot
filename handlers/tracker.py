@@ -7,6 +7,7 @@ from datetime import date
 from database import get_or_create_entry, update_category, update_note, update_score
 from keyboards import categories_kb, status_kb, main_menu_kb
 from services import format_entry_summary, get_recommendation, calc_day_score
+from utils.formatting import day_card, finish_card, note_saved_card
 
 router = Router()
 
@@ -18,11 +19,8 @@ class NoteState(StatesGroup):
 
 
 def parse_status_callback(data: str):
-    """Парсит callback вида st_<category>_<status>.
-    Корректно обрабатывает категории с _ в имени (например no_chaos).
-    """
     prefix = "st_"
-    raw = data[len(prefix):]  # убираем "st_"
+    raw = data[len(prefix):]
     for key in sorted(CATEGORY_KEYS, key=len, reverse=True):
         if raw.startswith(key + "_"):
             status = raw[len(key) + 1:]
@@ -37,8 +35,9 @@ async def fill_day(callback: CallbackQuery, state: FSMContext):
     entry = await get_or_create_entry(callback.from_user.id, today)
     summary = format_entry_summary(entry)
     await callback.message.edit_text(
-        f"Заполни свой день ({today}):\n\n{summary}\n\nВыбери категорию:",
+        day_card(today, summary, "Выбери категорию:"),
         reply_markup=categories_kb(entry),
+        parse_mode="HTML",
     )
     await callback.answer()
 
@@ -47,8 +46,11 @@ async def fill_day(callback: CallbackQuery, state: FSMContext):
 async def choose_category(callback: CallbackQuery):
     category_key = callback.data.replace("cat_", "")
     await callback.message.edit_text(
-        f"Как прошла категория?",
+        "┌─────────────────────┐\n"
+        "   Как прошла категория?\n"
+        "└─────────────────────┘",
         reply_markup=status_kb(category_key),
+        parse_mode="HTML",
     )
     await callback.answer()
 
@@ -72,8 +74,9 @@ async def set_status(callback: CallbackQuery):
 
     summary = format_entry_summary(entry)
     await callback.message.edit_text(
-        f"Обновлено! Твой день ({today}):\n\n{summary}\n\nВыбери следующую категорию:",
+        day_card(today, summary, "✔ Обновлено! Выбери следующую:"),
         reply_markup=categories_kb(entry),
+        parse_mode="HTML",
     )
     await callback.answer()
 
@@ -81,7 +84,12 @@ async def set_status(callback: CallbackQuery):
 @router.callback_query(F.data == "add_note")
 async def ask_note(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(
-        "Напиши заметку к сегодняшнему дню (любой текст):"
+        "┌─────────────────────┐\n"
+        "   💬 <b>Заметка</b>\n"
+        "├─────────────────────┤\n"
+        "   Напиши любой текст:\n"
+        "└─────────────────────┘",
+        parse_mode="HTML",
     )
     await state.set_state(NoteState.waiting_for_note)
     await callback.answer()
@@ -97,8 +105,9 @@ async def save_note(message: Message, state: FSMContext):
     summary = format_entry_summary(entry)
     await state.clear()
     await message.answer(
-        f"Заметка сохранена!\n\n{summary}\n\nВыбери категорию или заверши день:",
+        note_saved_card(summary),
         reply_markup=categories_kb(entry),
+        parse_mode="HTML",
     )
 
 
@@ -114,7 +123,8 @@ async def finish_day(callback: CallbackQuery):
     recommendation = get_recommendation(entry)
 
     await callback.message.edit_text(
-        f"День завершён!\n\n{summary}\n\n{recommendation}",
+        finish_card(today, summary, recommendation, score),
         reply_markup=main_menu_kb(),
+        parse_mode="HTML",
     )
     await callback.answer()

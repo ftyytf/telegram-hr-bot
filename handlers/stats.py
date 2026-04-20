@@ -5,6 +5,7 @@ from datetime import date, timedelta
 from database import get_or_create_entry, get_entries_for_period
 from keyboards import main_menu_kb
 from services import format_entry_summary, get_recommendation, calc_day_score
+from utils.formatting import today_card, recommendation_card, week_stats_card
 
 router = Router()
 
@@ -13,10 +14,12 @@ router = Router()
 async def show_today(callback: CallbackQuery):
     today = date.today().isoformat()
     entry = await get_or_create_entry(callback.from_user.id, today)
+    score = calc_day_score(entry)
     summary = format_entry_summary(entry)
     await callback.message.edit_text(
-        f"Твой день ({today}):\n\n{summary}",
+        today_card(today, summary, score),
         reply_markup=main_menu_kb(),
+        parse_mode="HTML",
     )
     await callback.answer()
 
@@ -27,8 +30,9 @@ async def show_recommendation(callback: CallbackQuery):
     entry = await get_or_create_entry(callback.from_user.id, today)
     recommendation = get_recommendation(entry)
     await callback.message.edit_text(
-        f"Рекомендация на основе сегодняшнего дня:\n\n{recommendation}",
+        recommendation_card(recommendation),
         reply_markup=main_menu_kb(),
+        parse_mode="HTML",
     )
     await callback.answer()
 
@@ -45,37 +49,26 @@ async def stats_week(callback: CallbackQuery):
 
     if not entries:
         await callback.message.edit_text(
-            "За последнюю неделю записей нет. Начни заполнять день!",
+            "┌─────────────────────────┐\n"
+            "   📊 <b>Статистика</b>\n"
+            "├─────────────────────────┤\n"
+            "   За неделю записей нет.\n"
+            "   Начни заполнять день! 💪\n"
+            "└─────────────────────────┘",
             reply_markup=main_menu_kb(),
+            parse_mode="HTML",
         )
         await callback.answer()
         return
 
-    total_score = 0
-    days_count = len(entries)
-    lines = []
-
+    days_data = []
     for e in entries:
         score = calc_day_score(e)
-        total_score += score
-        lines.append(f'{e["entry_date"]}: {score}/14')
+        days_data.append((e["entry_date"], score))
 
-    avg = round(total_score / days_count, 1)
-
-    text = (
-        f"Статистика за {days_count} дн. "
-        f"({week_ago.isoformat()} - {today.isoformat()}):\n\n"
-        + "\n".join(lines)
-        + f"\n\nСредний балл: {avg}/14"
-        + f"\nВсего баллов: {total_score}"
+    await callback.message.edit_text(
+        week_stats_card(week_ago.isoformat(), today.isoformat(), days_data),
+        reply_markup=main_menu_kb(),
+        parse_mode="HTML",
     )
-
-    if avg >= 10:
-        text += "\n\nОтличная неделя! Держи темп!"
-    elif avg >= 6:
-        text += "\n\nНеплохая неделя. Есть куда расти!"
-    else:
-        text += "\n\nСлабая неделя. Но ты отслеживаешь - это уже шаг вперёд!"
-
-    await callback.message.edit_text(text, reply_markup=main_menu_kb())
     await callback.answer()

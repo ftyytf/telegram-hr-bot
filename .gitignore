@@ -1,7 +1,19 @@
-﻿venv/
+﻿# Python
+venv/
 __pycache__/
 *.pyc
 .env
-*.db
-.idea/
+bot_data.db
+
+# Node/React (webapp development)
+node_modules/
+dist/
+.vite/
+
+# IDE
 .vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

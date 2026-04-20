@@ -5,7 +5,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# cache-bust-v2
+# cache-bust-v3
 COPY . .
 
 CMD ["python", "-u", "run.py"]

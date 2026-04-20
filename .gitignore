@@ -1,19 +1,10 @@
-﻿# Python
+﻿.env
 venv/
 __pycache__/
 *.pyc
-.env
-bot_data.db
-
-# Node/React (webapp development)
-node_modules/
+*.db
 dist/
-.vite/
-
-# IDE
-.vscode/
+exports/
+node_modules/
 .idea/
-
-# OS
-.DS_Store
-Thumbs.db
+.vscode/

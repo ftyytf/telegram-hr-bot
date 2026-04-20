@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мой стиль</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>👗 Подбор стиля</h1>
+        <p class="subtitle">Ответьте на вопросы, и мы подберём рекомендации</p>
+
+        <div id="quiz">
+            <div class="question" data-step="0">
+                <h2>Ваш пол?</h2>
+                <button class="btn" data-key="gender" data-value="male">Мужской</button>
+                <button class="btn" data-key="gender" data-value="female">Женский</button>
+            </div>
+
+            <div class="question hidden" data-step="1">
+                <h2>Ваш возраст?</h2>
+                <button class="btn" data-key="age" data-value="18-25">18-25</button>
+                <button class="btn" data-key="age" data-value="26-35">26-35</button>
+                <button class="btn" data-key="age" data-value="36-45">36-45</button>
+                <button class="btn" data-key="age" data-value="46+">46+</button>
+            </div>
+
+            <div class="question hidden" data-step="2">
+                <h2>Какой стиль вам ближе?</h2>
+                <button class="btn" data-key="style" data-value="casual">Casual</button>
+                <button class="btn" data-key="style" data-value="classic">Классика</button>
+                <button class="btn" data-key="style" data-value="sport">Спорт</button>
+                <button class="btn" data-key="style" data-value="romantic">Романтика</button>
+            </div>
+
+            <div class="question hidden" data-step="3">
+                <h2>Какой повод?</h2>
+                <button class="btn" data-key="occasion" data-value="everyday">На каждый день</button>
+                <button class="btn" data-key="occasion" data-value="work">На работу</button>
+                <button class="btn" data-key="occasion" data-value="date">На свидание</button>
+                <button class="btn" data-key="occasion" data-value="party">На вечеринку</button>
+            </div>
+
+            <div class="question hidden" data-step="4">
+                <h2>Предпочитаемые цвета?</h2>
+                <button class="btn" data-key="colors" data-value="neutral">Нейтральные</button>
+                <button class="btn" data-key="colors" data-value="bright">Яркие</button>
+                <button class="btn" data-key="colors" data-value="dark">Тёмные</button>
+                <button class="btn" data-key="colors" data-value="pastel">Пастельные</button>
+            </div>
+        </div>
+
+        <div id="result" class="hidden">
+            <h2>Готово! ✅</h2>
+            <p>Ваши ответы отправлены боту. Загляните в чат!</p>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,17 +1,17 @@
 import sys
 import os
+
 print("=== RUN.PY STARTED ===", flush=True)
 print(f"Python: {sys.version}", flush=True)
 print(f"CWD: {os.getcwd()}", flush=True)
 print(f"Files: {os.listdir('.')}", flush=True)
 
-# Check token BEFORE any aiogram import
 token = os.getenv("BOT_TOKEN", "")
 print(f"BOT_TOKEN exists: {bool(token)}", flush=True)
 print(f"BOT_TOKEN length: {len(token)}", flush=True)
 
 if not token:
-    print("FATAL: BOT_TOKEN is not set! Add it to Railway Variables.", flush=True)
+    print("FATAL: BOT_TOKEN is not set!", flush=True)
     sys.exit(1)
 
 import asyncio
@@ -44,10 +44,8 @@ async def main():
         default=DefaultBotProperties(parse_mode=ParseMode.HTML),
     )
     dp = Dispatcher(storage=MemoryStorage())
-    
     for router in all_routers:
         dp.include_router(router)
-    
     init_db()
     print("=== BOT STARTING POLLING ===", flush=True)
     await dp.start_polling(bot)
